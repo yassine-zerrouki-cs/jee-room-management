@@ -1,2 +1,13 @@
-# jee-room-management
-JEE application for managing computer lab rooms, equipment and reservations
+# JEE Room Management
+
+## Description
+Application web pour la gestion des salles de TP.
+
+## Fonctionnalités
+- Réservation de salles
+- Gestion des équipements
+- Consultation du planning
+
+## Technologies
+- JEE (Servlet, JSP)
+- MySQL

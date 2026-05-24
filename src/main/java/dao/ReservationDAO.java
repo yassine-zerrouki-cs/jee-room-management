@@ -35,14 +35,16 @@ public class ReservationDAO {
     	}
     	return false;
 		
-    }
+    }	
     public static boolean isSalleDisponible(Date date,Time heureDebut,Time heureFin,int salleId) {
     	try {
     	Connection conn=DBConnection.getConnection();
-    	String sql="SELECT * FROM reservation WHERE date=? AND salle_id=? ";
+    	String sql="SELECT * FROM reservation WHERE date=? AND salle_id=? AND (heure_debut < ? AND heure_fin > ?)";
     	PreparedStatement ps=conn.prepareStatement(sql);
     	ps.setDate(1, date);
     	ps.setInt(2, salleId);
+    	ps.setTime(3, heureFin);
+    	ps.setTime(4, heureDebut);
     	ResultSet rs =ps.executeQuery();	
     	if (rs.next()) {
         	return false;

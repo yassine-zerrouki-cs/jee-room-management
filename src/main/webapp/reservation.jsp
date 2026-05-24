@@ -1,5 +1,16 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+    <%@ page import="model.User" %>
+    <%
+User user = (User) session.getAttribute("user");
+
+if (user == null) {
+    response.sendRedirect("login.jsp");
+    return;
+}
+
+%>
+<a href="LogoutServlet">Logout</a>
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,6 +18,10 @@
 <title>Reservation</title>
 </head>
 <body>
+<h3>Bienvenue, <%= user.getNom() %> <%= user.getPrenom() %></h3>
+<a href="LogoutServlet">Logout</a>
+
+
 <form action="ReservationServlet" method ="post">
 <input type="date" name="date"><br>
 
@@ -23,9 +38,6 @@
 <label for="salleId">Salle id:</label>
 <input type="number" id="salleId" name="salleId"><br>
 
-
-<label for="utilisateurId">Utilisateur id:</label>
-<input type="number" id="utilisateurId" name="utilisateurId"><br>
 
 
 <button type="submit" >Réserver</button>

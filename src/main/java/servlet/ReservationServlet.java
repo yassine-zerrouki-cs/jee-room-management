@@ -1,5 +1,6 @@
 package servlet;
-
+import jakarta.servlet.http.HttpSession;
+import model.User;
 import java.io.IOException;
 import java.sql.Date;
 import java.sql.Time;
@@ -28,7 +29,17 @@ public class ReservationServlet extends HttpServlet {
 		int salleId =Integer.valueOf(request.getParameter("salleId"));
 		
 		
-		int utilisateurId = Integer.parseInt(request.getParameter("utilisateurId"));
+		HttpSession session = request.getSession(false);
+
+		User user = (User) session.getAttribute("user");
+
+		if (session == null || user == null) {
+		response.sendRedirect("login.jsp");
+		return;
+		}
+
+		int utilisateurId = user.getId();
+
 		
 		
 		boolean dispo = ReservationDAO.isSalleDisponible(date,

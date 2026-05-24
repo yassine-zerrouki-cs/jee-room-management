@@ -10,7 +10,6 @@ if (user == null) {
 }
 
 %>
-<a href="LogoutServlet">Logout</a>
 <!DOCTYPE html>
 <html>
 <head>
@@ -20,7 +19,7 @@ if (user == null) {
 <body>
 <h3>Bienvenue, <%= user.getNom() %> <%= user.getPrenom() %></h3>
 <a href="LogoutServlet">Logout</a>
-
+<br><br>
 
 <form action="ReservationServlet" method ="post">
 <input type="date" name="date"><br>

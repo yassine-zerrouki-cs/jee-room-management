@@ -1,104 +1,189 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"%>
-<%@ page import="model.User" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" %>
+	<%@ page import="model.User" %>
+		<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
-<%
-User user = (User) session.getAttribute("user");
+			<% User user=(User) session.getAttribute("user"); if (user==null) { response.sendRedirect("login.jsp");
+				return; } %>
 
-if (user == null) {
-    response.sendRedirect("login.jsp");
-    return;
-}
-%>
+				<!DOCTYPE html>
+				<html>
 
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Reservation</title>
-</head>
+				<head>
+					<meta charset="UTF-8">
+					<title>Reservation</title>
 
-<body>
+					<!-- Bootstrap -->
+					<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+						rel="stylesheet">
 
-<h3>Bienvenue, <%= user.getNom() %> <%= user.getPrenom() %></h3>
+					<!-- SweetAlert -->
+					<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<a href="LogoutServlet">Logout</a>
+				</head>
 
-<br><br>
+				<body class="bg-light">
 
-<form action="ReservationServlet" method="post">
+					<!-- NAVBAR -->
+					<nav class="navbar navbar-dark bg-dark px-3">
+						<span class="navbar-brand">Gestion Salles TP</span>
+						<span class="text-white">
+							Bienvenue <%= user.getNom() %>
+								<%= user.getPrenom() %>
+						</span>
+						<a href="LogoutServlet" class="btn btn-danger btn-sm">Logout</a>
+					</nav>
 
-    <label>Date :</label>
-    <input type="date" name="date"><br><br>
+					<div class="container mt-4">
 
-    <label>Heure début :</label>
-    <input type="time" name="heureDebut"><br><br>
+						<!-- FORM CARD -->
+						<div class="card shadow p-4 mb-4">
 
-    <label>Heure fin :</label>
-    <input type="time" name="heureFin"><br><br>
-<h3>Bloc5 size = ${sallesBloc5.size()}
-Bloc6 size = ${sallesBloc6.size()}</h3>
-<h3>Nombre salles bloc 5 : ${sallesBloc5.size()}</h3>
+							<h4 class="mb-3">Nouvelle Réservation</h4>
 
+							<form action="ReservationServlet" method="post">
 
-    <label>Salle :</label>
+								<div class="row">
 
-<select name="salleId">
+									<div class="col-md-4">
+										<label>Date</label>
+										<input type="date" name="date" class="form-control" required>
+									</div>
 
-    <optgroup label="Bloc 5">
-        <c:forEach var="s" items="${sallesBloc5}">
-            <option value="${s.id}">
-                ${s.nom} - ${s.capacite}
-            </option>
-        </c:forEach>
-    </optgroup>
+									<div class="col-md-4">
+										<label>Heure début</label>
+										<input type="time" name="heureDebut" class="form-control" required>
+									</div>
 
-    <optgroup label="Bloc 6">
-        <c:forEach var="s" items="${sallesBloc6}">
-            <option value="${s.id}">
-                ${s.nom} - ${s.capacite}
-            </option>
-        </c:forEach>
-    </optgroup>
+									<div class="col-md-4">
+										<label>Heure fin</label>
+										<input type="time" name="heureFin" class="form-control" required>
+									</div>
+
+								</div>
+
+								<br>
+
+								<label>Salle</label>
+								<select name="salleId" required>
+
+    <option value="">-- Choisir une salle --</option>
+
+    <c:forEach var="s" items="${salles}">
+
+        <option value="${s.id}"
+            <c:if test="${selectedSalle == s.id}">selected</c:if>>
+            ${s.nom}
+        </option>
+
+    </c:forEach>
 
 </select>
 
-    <br><br>
-    <button type="button" onclick="verifier()">
-    Vérifier disponibilité
-</button>
+								<br>
 
-    <button type="submit" id="reserveBtn">
-    Réserver
-</button>
+								<button type="button" onclick="verifier()" class="btn btn-warning">
+									Vérifier disponibilité
+								</button>
 
-</form>
+								<button type="submit" id="reserveBtn" class="btn btn-success" disabled>
+									Réserver
+								</button>
 
-<script>
-function verifier() {
+							</form>
 
-    let date = document.querySelector("[name='date']").value;
-    let debut = document.querySelector("[name='heureDebut']").value;
-    let fin = document.querySelector("[name='heureFin']").value;
-    let salle = document.querySelector("[name='salleId']").value;
+						</div>
 
-    fetch("CheckAvailabilityServlet?date=" + date +
-          "&heureDebut=" + debut +
-          "&heureFin=" + fin +
-          "&salleId=" + salle)
-    .then(response => response.text())
-    .then(data => {
+						<!-- TABLE HISTORIQUE -->
+						<div class="card shadow p-4">
 
-        if (data === "OK") {
-            document.getElementById("reserveBtn").disabled = false;
-            alert("Salle disponible ✅");
-        } else {
-            document.getElementById("reserveBtn").disabled = true;
-            alert("Salle occupée ❌");
-        }
-    });
-}
-</script>
+							<h4>📌 Mes réservations</h4>
 
-</body>
-</html>
+							<table class="table table-striped">
+
+								<thead class="table-dark">
+									<tr>
+										<th>Date</th>
+										<th>Début</th>
+										<th>Fin</th>
+										<th>Salle</th>
+										<th>Statut</th>
+									</tr>
+								</thead>
+
+								<tbody>
+
+									<c:forEach var="r" items="${reservations}">
+										<tr>
+											<td>${r.date}</td>
+											<td>${r.heureDebut}</td>
+											<td>${r.heureFin}</td>
+											<td>${r.salleId}</td>
+											<td>
+												<span class="badge bg-success">${r.statut}</span>
+											</td>
+										</tr>
+									</c:forEach>
+
+								</tbody>
+
+							</table>
+
+						</div>
+
+					</div>
+
+					<!-- POPUP SWEETALERT -->
+					<% String msg=request.getParameter("msg"); %>
+
+						<script>
+							let msg = "<%= msg %>";
+
+							if (msg === "success") {
+								Swal.fire({
+									icon: 'success',
+									title: 'Réservation réussie',
+									showConfirmButton: false,
+									timer: 1500
+								});
+							}
+
+							if (msg === "error") {
+								Swal.fire({
+									icon: 'error',
+									title: 'Salle occupée',
+									timer: 1500
+								});
+							}
+						</script>
+
+						<!-- JS -->
+						<script>
+							function verifier() {
+
+								let date = document.querySelector("[name='date']").value;
+								let debut = document.querySelector("[name='heureDebut']").value;
+								let fin = document.querySelector("[name='heureFin']").value;
+								let salle = document.querySelector("[name='salleId']").value;
+
+								fetch("CheckAvailabilityServlet?date=" + date +
+									"&heureDebut=" + debut +
+									"&heureFin=" + fin +
+									"&salleId=" + salle)
+
+									.then(r => r.text())
+									.then(data => {
+
+										if (data === "OK") {
+											document.getElementById("reserveBtn").disabled = false;
+											Swal.fire("Disponible", "Salle libre", "success");
+										} else {
+											document.getElementById("reserveBtn").disabled = true;
+											Swal.fire("Occupée", "Salle déjà réservée", "error");
+										}
+									});
+							}
+						</script>
+
+				</body>
+
+				</html>

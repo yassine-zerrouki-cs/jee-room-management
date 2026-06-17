@@ -1,4 +1,15 @@
-WEB-INF/lib/
-*.jar
+# Eclipse
+.settings/
+.classpath
+.project
+
+# Build
+target/
 build/
+
+# Java
 *.class
+*.jar
+
+# Web
+WEB-INF/lib/
